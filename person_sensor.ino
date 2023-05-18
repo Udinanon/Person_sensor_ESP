@@ -22,6 +22,7 @@ const int32_t SAMPLE_DELAY_MS = 200;
 
 #define SCL_PIN D1 // YELLOW
 #define SDA_PIN D2 // BLUE
+#define SENSOR_MAX_FACES 4
 
 void setup() {
   // You need to make sure you call Wire.begin() in setup, or the I2C access
@@ -40,30 +41,36 @@ void loop() {
     return;
   }
 
-
-  Serial.println("********");
+  //Serial.println("********");
+  Serial.print("{\"n_faces\":");
   Serial.print(results.num_faces);
-  Serial.println(" faces found");
-  for (int i = 0; i < results.num_faces; ++i) {
+  Serial.print(", \"faces\":[");
+  for (int i = 0; i < SENSOR_MAX_FACES; ++i) {
     const person_sensor_face_t* face = &results.faces[i];
-    Serial.print("Face #");
+    Serial.print("{");
+    Serial.print("\"face\":");
     Serial.print(i);
-    Serial.print(": ");
+    Serial.print(", \"conf\":");
     Serial.print(face->box_confidence);
-    Serial.print(" confidence, (");
+    Serial.print(", \"box\":[");   
     Serial.print(face->box_left);
     Serial.print(", ");
     Serial.print(face->box_top);
-    Serial.print("), (");
+    Serial.print(", ");
     Serial.print(face->box_right);
     Serial.print(", ");
     Serial.print(face->box_bottom);
-    Serial.print("), ");
+    Serial.print("], \"facing\":");
     if (face->is_facing) {
-      Serial.println("facing");
+      Serial.print("1");
     } else {
-      Serial.println("not facing");
+      Serial.print("0");
+    }
+    Serial.print("}");
+    if(i < SENSOR_MAX_FACES - 1){
+      Serial.print(",");
     }
   }
+  Serial.println("]}");
   delay(SAMPLE_DELAY_MS);
 }
